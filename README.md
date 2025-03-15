@@ -3,7 +3,7 @@
 <p align="justify">
 Esta aplicação permite visualizar o crescimento da frota de veículos em uma cidade específica, com base no código do IBGE obtido a partir de um CEP da localidade. 
 Ela faz isso obtendo dados da API [ViaCep](https://viacep.com.br/), passando um CEP como argumento. Em seguida, os dados são separados, pois apenas o código do IBGE da cidade e seu nome nos interessam. 
-Com esses parâmetros, fazemos uma requisição à API do [IBGE](https://servicodados.ibge.gov.br/api/docs/pesquisas). Com os dados obtidos, criamos um [DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) para ser consumido pela biblioteca [Matplotlib](https://matplotlib.org/stable/index.html) e gerar um gráfico que permite observar o crescimento ou decaimento da frota de veículos da cidade analisada.
+Com esses parâmetros, fazemos uma requisição à API do [IBGE](https://servicodados.ibge.gov.br/api/docs/pesquisas). Com os dados obtidos, criamos um [DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) para ser consumido pela biblioteca [Matplotlib](https://matplotlib.org/stable/index.html) e gerar um gráfico que permite observar o crescimento ou decaimento da frota de veículos da cidade analisada. Para o FrontEnd foi utilizado a library [Streamlit](https://docs.streamlit.io/) uma vez que ela abstrai o uso de liguagens de marcação como HTML e CSS.
 </p>
 
 ## Estrutura do projeto
