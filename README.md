@@ -14,6 +14,11 @@ Com esses parâmetros, fazemos uma requisição à API do [IBGE](https://servico
 │   │-- library.py
 │   │-- main.py
 │-- /data
+│   │-- {cidade}.xlsx
+│-- /logs
+│   │-- app.logs
+│-- /image
+│   │-- /README
 │-- requirements.txt
 │-- .gitignore
 ```
@@ -49,6 +54,10 @@ pip install -r requirements.txt
 ```bash
 streamlit run ./api/main.py
 ```
+
+### Programa em Execução - Porta padrão (http://localhost:8501/)
+
+![1742053728514](image/README/1742053728514.png)
 
 ### Exemplos de Entradas
 
