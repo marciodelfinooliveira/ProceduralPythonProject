@@ -1,6 +1,20 @@
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+import logging
+
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+logging.basicConfig(
+    filename='logs/app.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+logger = logging.getLogger(__name__)
 
 
 def inputCep() -> str:
@@ -20,8 +34,8 @@ def inputCep() -> str:
         
         if len(cep) != 8 or not cep.isdigit():
             raise ValueError("CEP inválido. O CEP deve conter exatamente 8 dígitos numéricos.")
+        
         return cep
-    
     except Exception as e:
         raise Exception(f"Erro ao fazer a requisição: {e}")
 
@@ -46,8 +60,8 @@ def requestGetToViaCep(cep: str) -> dict:
         
         if response.status_code != 200:
             raise ValueError(f"CEP {cep} não encontrado ou resposta inválida.")
+        
         return response.json()
-    
     except requests.exceptions.RequestException as e:
         raise Exception(f"Erro ao fazer a requisição: {e}")
     
@@ -63,17 +77,19 @@ def setString(cityCode: str) -> str:
     Remove o último caractere de uma string que representa o código da cidade
     para ajusta-lo ao parametro esperado da API do IBGE.
 
-    Args:
-        cityCode (str): O código da cidade como uma string.
+    @param cityCode: O código da cidade como uma string.
+    @type cityCode: str
+    @return: O código da cidade sem o último caractere.
+    @rtype: str
 
-    Returns:
-        str: O código da cidade sem o último caractere.
+    @raises ValueError: O parametro não foi enviado
+    @raises Exception: Erro ao processar o parametro 
     """
     try:
         if not cityCode:
-            raise Exception(f"O código não foi enviado: {e}")
+            raise ValueError(f"O código não foi enviado: {e}")
+        
         return cityCode[:-1]
-    
     except Exception as e:
         raise Exception(f"Erro ao processar o código da cidade: {str(e)}")
     
@@ -118,8 +134,8 @@ def requestGetToIbge(code: str) -> dict:
         
         if response.status_code != 200:
             raise ValueError(f"Erro ao fazer a requisição à API do IBGE: {e}")
+        
         return response.json()
-    
     except requests.exceptions.RequestException as e:
         raise Exception(f"Erro ao fazer a requisição: {e}")
     
@@ -132,20 +148,17 @@ def requestGetToIbge(code: str) -> dict:
 
 def prepareDataFrame(responseJson: list) -> pd.DataFrame:
     """
-    Transforma o JSON de resposta da API do IBGE em um DataFrame, ignorando a localidade '0' (Brasil).
+    Método que transforma o JSON de resposta da API do IBGE em um DataFrame, ignorando a localidade '0' (Brasil).
 
-    Args:
-        responseJson (list): Uma lista contendo o JSON de resposta da API.
-            O JSON deve ter a estrutura esperada, com dados de localidades e anos.
+    @param responseJson: Lista contendo o JSON de resposta da API. O JSON deve ter a estrutura esperada, com dados de localidades e anos.
+    @type responseJson: list
 
-    Returns:
-        pd.DataFrame: Um DataFrame contendo as colunas 'Localidade', 'Ano' e 'Valor'.
-            Apenas os dados da cidade determinada na resposta (localidade != '0') são incluídos.
+    @return: DataFrame contendo as colunas 'Localidade', 'Ano' e 'Valor'. Apenas os dados da cidade determinada na resposta (localidade != '0') são incluídos.
+    @rtype: pd.DataFrame
 
-    Raises:
-        ValueError: Se o JSON de resposta estiver vazio ou não contiver a estrutura esperada.
-        KeyError: Se o JSON não tiver as chaves esperadas, como 'res' ou 'localidade'.
-        TypeError: Se os valores não puderem ser convertidos para inteiros.
+    @raises ValueError: Se o JSON de resposta estiver vazio ou não contiver a estrutura esperada.
+    @raises KeyError: Se o JSON não tiver as chaves esperadas, como 'res' ou 'localidade'.
+    @raises TypeError: Se os valores não puderem ser convertidos para inteiros.
     """
     try:
         if not responseJson:
@@ -174,7 +187,6 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
         })
 
         return dataFrame
-
     except KeyError as e:
         raise KeyError(f"Erro: Chave ausente no JSON - {str(e)}")
     except TypeError as e:
@@ -185,13 +197,14 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
 
 def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
     """
-    Plota um gráfico usando Matplotlib mostrando os valores de uma cidade 
-    específica ao longo dos anos.
+    Método que plota um gráfico usando Matplotlib, mostrando os valores de uma cidade específica ao longo dos anos.
 
-    Args:
-        df (pd.DataFrame): Um DataFrame contendo as colunas 'Localidade', 'Ano' e 'Valor'.
-        codeIbge (str): Código da cidade a ser exibida no gráfico.
-        cityName (str): Nome da cidade a ser exibido no gráfico.
+    @param df: DataFrame contendo as colunas 'Localidade', 'Ano' e 'Valor'.
+    @type df: pd.DataFrame
+    @param codeIbge: Código da cidade a ser exibida no gráfico.
+    @type codeIbge: str
+    @param cityName: Nome da cidade a ser exibido no gráfico.
+    @type cityName: str
     """
     try:
         # Filtra os dados apenas para a cidade
@@ -228,11 +241,37 @@ def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
         plt.tight_layout()
 
         return fig
-
     except ValueError as e:
         raise ValueError(f"Erro: {str(e)}")
     except KeyError as e:
         raise KeyError(f"Erro: Chave ausente no DataFrame - {str(e)}")
     except Exception as e:
         raise Exception(f"Erro inesperado ao plotar o gráfico: {str(e)}")
+    
 
+def saveIbgeResponse(df: pd.DataFrame, cityName: str) -> str:
+    """
+    Método que salva o DataFrame em um arquivo .xlsx na pasta 'data'.
+
+    @param df: DataFrame a ser salvo.
+    @type df: pd.DataFrame
+    @param cityName: Nome da localidade buscada.
+    @type cityName: str
+
+    @return: Caminho do arquivo salvo.
+    @rtype: str
+
+    @raises Exception: Se ocorrer um erro ao salvar o arquivo.
+    """
+    try:
+        if not os.path.exists('data'):
+            os.makedirs('data')
+
+        file = os.path.join('data', f'{cityName}.xlsx')
+        logger.info(f"Salvando arquivo em: {file}")
+        df.to_excel(file, index=False)
+
+        return file
+    except Exception as e:
+        logger.error(f"Erro ao salvar o arquivo: {str(e)}")
+        raise Exception(f"Erro ao salvar o arquivo: {str(e)}")
