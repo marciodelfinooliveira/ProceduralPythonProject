@@ -7,6 +7,7 @@ Com esses parâmetros, fazemos uma requisição à API do [IBGE](https://servico
 </p>
 
 ## Estrutura do projeto
+
 ```bash
 /projeto
 │-- /api
@@ -20,25 +21,46 @@ Com esses parâmetros, fazemos uma requisição à API do [IBGE](https://servico
 ## Procedimentos Para Execução do Projeto
 
 ### Clone o Projeto
+
 ```bash
 git clone https://github.com/marciodelfinooliveira/ProceduralPythonProject.git
 ```
 
 ### Crie um Virtual Environment
+
 ```bash
 python3 -m venv venv  # Para sistemas UNIX
 ```
 
 ### Ative a Virtual Environment
+
 ```bash
 source venv/bin/activate  # Para sistemas UNIX
 ```
 
 ### Instale as bibliotecas necessárias
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### Execute o sistema via Streamlit
+
 ```bash
 streamlit run ./api/main.py
+```
+
+### Exemplos de Entradas
+
+```
+João Pessoa - 58046-731
+Patos - 58700-015
+Pombal - 58840-970
+Recife - 52080-066
+Manaus - 69033-008
+São Paulo - 04962-30
+```
+
+### Exemplos de Saida
+
+![1742053265883](image/README/1742053265883.png)

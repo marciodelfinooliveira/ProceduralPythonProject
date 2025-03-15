@@ -219,7 +219,7 @@ def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
         ax.plot(df_cidade['Ano'], df_cidade['Valor'], label=cityName, marker='o', linestyle='-', linewidth=2, color='blue')
 
         # Configurações do gráfico
-        ax.set_title(f'Crescimento da Frota de Veículos para {cityName}', fontsize=16)
+        ax.set_title(f'Histórico da Frota de Veículos para {cityName}', fontsize=16)
         ax.set_xlabel('Ano', fontsize=14)
         ax.set_ylabel('Quantidade de Veículos', fontsize=14)
 
