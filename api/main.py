@@ -21,6 +21,5 @@ def main():
             print(e)
 
 
-# Executa o programa
 if __name__ == "__main__":
     main()
