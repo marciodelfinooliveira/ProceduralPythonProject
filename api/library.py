@@ -202,32 +202,32 @@ def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
             raise ValueError(f"Nenhum dado encontrado para {cityName}.")
 
         # Cria o gráfico
-        plt.figure(figsize=(12, 7))
-        plt.plot(df_cidade['Ano'], df_cidade['Valor'], label=cityName, marker='o', linestyle='-', linewidth=2, color='blue')
+        fig, ax = plt.subplots(figsize=(12, 7))
+        ax.plot(df_cidade['Ano'], df_cidade['Valor'], label=cityName, marker='o', linestyle='-', linewidth=2, color='blue')
 
         # Configurações do gráfico
-        plt.title(f'Crescimento da Frota de Veículos para {cityName}', fontsize=16)
-        plt.xlabel('Ano', fontsize=14)
-        plt.ylabel('Quantidade de Veículos', fontsize=14)
+        ax.set_title(f'Crescimento da Frota de Veículos para {cityName}', fontsize=16)
+        ax.set_xlabel('Ano', fontsize=14)
+        ax.set_ylabel('Quantidade de Veículos', fontsize=14)
 
         # Desativa a notação científica no eixo y
-        plt.ticklabel_format(axis='y', style='plain')
+        ax.ticklabel_format(axis='y', style='plain')
 
         # Formata os rótulos do eixo y com separadores de milhares
-        plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
 
         # Define os rótulos do eixo x para mostrar todos os anos
-        plt.xticks(df_cidade['Ano'], rotation=45)
+        ax.set_xticks(df_cidade['Ano'])
+        ax.tick_params(axis='x', rotation=45)  # Rotaciona os rótulos para melhor legibilidade
 
         # Adiciona legendas e grid
-        plt.legend(fontsize=12)
-        plt.grid(True, linestyle='--', alpha=0.7)
+        ax.legend(fontsize=12)
+        ax.grid(True, linestyle='--', alpha=0.7)
 
         # Ajusta o layout para evitar cortes
         plt.tight_layout()
 
-        # Exibe o gráfico
-        plt.show()
+        return fig
 
     except ValueError as e:
         raise ValueError(f"Erro: {str(e)}")
@@ -235,4 +235,4 @@ def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
         raise KeyError(f"Erro: Chave ausente no DataFrame - {str(e)}")
     except Exception as e:
         raise Exception(f"Erro inesperado ao plotar o gráfico: {str(e)}")
-    
+
