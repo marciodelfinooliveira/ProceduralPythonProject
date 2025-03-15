@@ -3,7 +3,9 @@ from library import (
     requestGetToViaCep,
     filterIbgeCodeInResponse,
     requestGetToIbge,
-    prepareDataFrame
+    prepareDataFrame,
+    setString,
+    plotGraph
 )
 
 def main():
@@ -15,19 +17,17 @@ def main():
             responseViaCep = requestGetToViaCep(inputCep())
             
             localidade = filterIbgeCodeInResponse(responseViaCep, 'localidade')
-            ibge = filterIbgeCodeInResponse(responseViaCep, 'ibge')
+            codeIbge = setString(filterIbgeCodeInResponse(responseViaCep, 'ibge'))
             
-            responseIbge = requestGetToIbge(ibge)
+            dataFrame = prepareDataFrame(requestGetToIbge(codeIbge))
 
-            dataFrame = prepareDataFrame(responseIbge)
-
-            print(dataFrame)
+            plotGraph(dataFrame, codeIbge, localidade)
             break
         
         except ValueError as e:
-            print(e)
+            raise ValueError(f"Erro: {str(e)}")
         
         except Exception as e:
-            print(e)
-
+            raise Exception(f"Erro inesperado ao executar o sistema: {str(e)}")
+        
 main() if (__name__ == "__main__") else exit

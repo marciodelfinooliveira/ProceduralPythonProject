@@ -56,7 +56,27 @@ def requestGetToViaCep(cep: str) -> dict:
     
     except Exception as e:
         raise Exception(f"Erro inesperado: {e}")
+    
 
+def setString(cityCode: str) -> str:
+    """
+    Remove o último caractere de uma string que representa o código da cidade
+    para ajusta-lo ao parametro esperado da API do IBGE.
+
+    Args:
+        cityCode (str): O código da cidade como uma string.
+
+    Returns:
+        str: O código da cidade sem o último caractere.
+    """
+    try:
+        if not cityCode:
+            raise Exception(f"O código não foi enviado: {e}")
+        return cityCode[:-1]
+    
+    except Exception as e:
+        raise Exception(f"Erro ao processar o código da cidade: {str(e)}")
+    
 
 def filterIbgeCodeInResponse(dict: dict, key: str) -> str:
     """
@@ -112,7 +132,7 @@ def requestGetToIbge(code: str) -> dict:
 
 def prepareDataFrame(responseJson: list) -> pd.DataFrame:
     """
-    Transforma o JSON de resposta da API do IBGE em um DataFrame do pandas.
+    Transforma o JSON de resposta da API do IBGE em um DataFrame, ignorando a localidade '0' (Brasil).
 
     Args:
         responseJson (list): Uma lista contendo o JSON de resposta da API.
@@ -120,6 +140,7 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: Um DataFrame contendo as colunas 'Localidade', 'Ano' e 'Valor'.
+            Apenas os dados da cidade determinada na resposta (localidade != '0') são incluídos.
 
     Raises:
         ValueError: Se o JSON de resposta estiver vazio ou não contiver a estrutura esperada.
@@ -136,6 +157,9 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
 
         for entry in responseJson[0]['res']:
             localidade = entry['localidade']
+
+            if localidade == '0':
+                continue
             res_data = entry['res']
 
             for ano, valor in res_data.items():
@@ -157,4 +181,58 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
         raise TypeError(f"Erro: Falha ao converter valores para inteiros - {str(e)}")
     except Exception as e:
         raise Exception(f"Erro inesperado ao processar o JSON: {str(e)}")
+    
+
+def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
+    """
+    Plota um gráfico usando Matplotlib mostrando os valores de uma cidade 
+    específica ao longo dos anos.
+
+    Args:
+        df (pd.DataFrame): Um DataFrame contendo as colunas 'Localidade', 'Ano' e 'Valor'.
+        codeIbge (str): Código da cidade a ser exibida no gráfico.
+        cityName (str): Nome da cidade a ser exibido no gráfico.
+    """
+    try:
+        # Filtra os dados apenas para a cidade
+        df_cidade = df[df['Localidade'] == codeIbge]
+
+        # Verifica se há dados para a cidade
+        if df_cidade.empty:
+            raise ValueError(f"Nenhum dado encontrado para {cityName}.")
+
+        # Cria o gráfico
+        plt.figure(figsize=(12, 7))
+        plt.plot(df_cidade['Ano'], df_cidade['Valor'], label=cityName, marker='o', linestyle='-', linewidth=2, color='blue')
+
+        # Configurações do gráfico
+        plt.title(f'Crescimento da Frota de Veículos para {cityName}', fontsize=16)
+        plt.xlabel('Ano', fontsize=14)
+        plt.ylabel('Quantidade de Veículos', fontsize=14)
+
+        # Desativa a notação científica no eixo y
+        plt.ticklabel_format(axis='y', style='plain')
+
+        # Formata os rótulos do eixo y com separadores de milhares
+        plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{int(x):,}'))
+
+        # Define os rótulos do eixo x para mostrar todos os anos
+        plt.xticks(df_cidade['Ano'], rotation=45)
+
+        # Adiciona legendas e grid
+        plt.legend(fontsize=12)
+        plt.grid(True, linestyle='--', alpha=0.7)
+
+        # Ajusta o layout para evitar cortes
+        plt.tight_layout()
+
+        # Exibe o gráfico
+        plt.show()
+
+    except ValueError as e:
+        raise ValueError(f"Erro: {str(e)}")
+    except KeyError as e:
+        raise KeyError(f"Erro: Chave ausente no DataFrame - {str(e)}")
+    except Exception as e:
+        raise Exception(f"Erro inesperado ao plotar o gráfico: {str(e)}")
     
