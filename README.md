@@ -31,6 +31,12 @@ Com esses parâmetros, fazemos uma requisição à API do [IBGE](https://servico
 git clone https://github.com/marciodelfinooliveira/ProceduralPythonProject.git
 ```
 
+### Entre na pasta
+
+```bash
+cd ProceduralPythonProject/
+```
+
 ### Crie um Virtual Environment
 
 ```bash
@@ -70,6 +76,6 @@ Manaus - 69033-008
 São Paulo - 04962-30
 ```
 
-### Exemplos de Saida
+Exemplos de Saida
 
 ![1742053265883](image/README/1742053265883.png)
