@@ -2,7 +2,8 @@ from library import (
     inputCep,
     requestGetToViaCep,
     filterIbgeCodeInResponse,
-    requestGetToIbge
+    requestGetToIbge,
+    prepareDataFrame
 )
 
 def main():
@@ -11,7 +12,16 @@ def main():
     """
     while True:
         try:
-            responseIbge = requestGetToIbge(filterIbgeCodeInResponse(requestGetToViaCep(inputCep())))
+            responseViaCep = requestGetToViaCep(inputCep())
+            
+            localidade = filterIbgeCodeInResponse(responseViaCep, 'localidade')
+            ibge = filterIbgeCodeInResponse(responseViaCep, 'ibge')
+            
+            responseIbge = requestGetToIbge(ibge)
+
+            dataFrame = prepareDataFrame(responseIbge)
+
+            print(dataFrame)
             break
         
         except ValueError as e:
@@ -20,6 +30,4 @@ def main():
         except Exception as e:
             print(e)
 
-
-if __name__ == "__main__":
-    main()
+main() if (__name__ == "__main__") else exit

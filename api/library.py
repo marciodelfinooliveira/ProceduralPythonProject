@@ -1,4 +1,7 @@
 import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+
 
 def inputCep() -> str:
     """
@@ -55,14 +58,14 @@ def requestGetToViaCep(cep: str) -> dict:
         raise Exception(f"Erro inesperado: {e}")
 
 
-def filterIbgeCodeInResponse(dicionario: dict) -> str:
+def filterIbgeCodeInResponse(dict: dict, key: str) -> str:
     """
     O método verifica se a chave 'ibge' está presente no dicionário e retorna
     o valor associado a essa chave, caso a chave não exista ou ocorra algum erro,
     uma exceção é levantada.
 
-    @param dicionario: Dicionário contendo os dados retornados do ViaCep.
-    @type dicionario: dict
+    @param dict: Dicionário contendo os dados retornados do ViaCep.
+    @type dict: dict
 
     @return: Valor correspondente à chave 'ibge'.
     @rtype: str
@@ -71,8 +74,7 @@ def filterIbgeCodeInResponse(dicionario: dict) -> str:
     @raises Exception: Se ocorrer um erro inesperado durante a execução do método.
     """
     try:
-        if 'ibge' in dicionario:
-            return dicionario['ibge']            
+        if key in dict: return dict[key]            
         raise KeyError("A chave 'ibge' não foi encontrada no dicionário.")
     
     except Exception as e:
@@ -83,8 +85,8 @@ def requestGetToIbge(code: str) -> dict:
     """
     Método que faz uma requisição à API do IBGE usando o código IBGE.
 
-    @param ibge_code: Código IBGE da localidade.
-    @type ibge_code: str
+    @param code: Código IBGE da localidade.
+    @type code: str
 
     @return: Dicionário com os dados retornados pela API do IBGE.
     @rtype: dict
@@ -92,7 +94,7 @@ def requestGetToIbge(code: str) -> dict:
     @raises Exception: Se ocorrer um erro durante a requisição ou processamento.
     """
     try:
-        response = requests.get(f'https://servicodados.ibge.gov.br/api/v1/localidades/municipios/{code}')
+        response = requests.get(f'https://servicodados.ibge.gov.br/api/v1/pesquisas/indicadores/28122/resultados/0%7C{code}')
         
         if response.status_code != 200:
             raise ValueError(f"Erro ao fazer a requisição à API do IBGE: {e}")
@@ -106,3 +108,53 @@ def requestGetToIbge(code: str) -> dict:
     
     except Exception as e:
         raise Exception(f"Erro inesperado: {e}")
+
+
+def prepareDataFrame(responseJson: list) -> pd.DataFrame:
+    """
+    Transforma o JSON de resposta da API do IBGE em um DataFrame do pandas.
+
+    Args:
+        responseJson (list): Uma lista contendo o JSON de resposta da API.
+            O JSON deve ter a estrutura esperada, com dados de localidades e anos.
+
+    Returns:
+        pd.DataFrame: Um DataFrame contendo as colunas 'Localidade', 'Ano' e 'Valor'.
+
+    Raises:
+        ValueError: Se o JSON de resposta estiver vazio ou não contiver a estrutura esperada.
+        KeyError: Se o JSON não tiver as chaves esperadas, como 'res' ou 'localidade'.
+        TypeError: Se os valores não puderem ser convertidos para inteiros.
+    """
+    try:
+        if not responseJson:
+            raise ValueError("O JSON de resposta está vazio.")
+
+        localidades = []
+        anos = []
+        valores = []
+
+        for entry in responseJson[0]['res']:
+            localidade = entry['localidade']
+            res_data = entry['res']
+
+            for ano, valor in res_data.items():
+                localidades.append(localidade)
+                anos.append(int(ano))
+                valores.append(int(valor))
+
+        dataFrame = pd.DataFrame({
+            'Localidade': localidades,
+            'Ano': anos,
+            'Valor': valores
+        })
+
+        return dataFrame
+
+    except KeyError as e:
+        raise KeyError(f"Erro: Chave ausente no JSON - {str(e)}")
+    except TypeError as e:
+        raise TypeError(f"Erro: Falha ao converter valores para inteiros - {str(e)}")
+    except Exception as e:
+        raise Exception(f"Erro inesperado ao processar o JSON: {str(e)}")
+    
