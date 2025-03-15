@@ -33,10 +33,12 @@ def inputCep() -> str:
         cep = input("Insira o número do CEP para consulta: ")
         
         if len(cep) != 8 or not cep.isdigit():
+            logger.info("CEP inválido. O CEP deve conter exatamente 8 dígitos numéricos.")
             raise ValueError("CEP inválido. O CEP deve conter exatamente 8 dígitos numéricos.")
         
         return cep
     except Exception as e:
+        logger.info(f"Erro ao fazer a requisição: {e}")
         raise Exception(f"Erro ao fazer a requisição: {e}")
 
 
@@ -59,16 +61,18 @@ def requestGetToViaCep(cep: str) -> dict:
         response = requests.get(f'https://viacep.com.br/ws/{cep}/json/')
         
         if response.status_code != 200:
+            logger.info(f"CEP {cep} não encontrado ou resposta inválida.")
             raise ValueError(f"CEP {cep} não encontrado ou resposta inválida.")
         
         return response.json()
     except requests.exceptions.RequestException as e:
+        logger.info(f"Erro ao fazer a requisição: {e}")
         raise Exception(f"Erro ao fazer a requisição: {e}")
-    
     except ValueError as e:
+        logger.info(f"Erro ao processar a resposta: {e}")
         raise ValueError(f"Erro ao processar a resposta: {e}")
-    
     except Exception as e:
+        logger.info(f"Erro inesperado: {e}")
         raise Exception(f"Erro inesperado: {e}")
     
 
@@ -87,10 +91,12 @@ def setString(cityCode: str) -> str:
     """
     try:
         if not cityCode:
+            logger.info(f"O código não foi enviado: {e}")
             raise ValueError(f"O código não foi enviado: {e}")
         
         return cityCode[:-1]
     except Exception as e:
+        logger.info(f"Erro ao processar o código da cidade: {str(e)}")
         raise Exception(f"Erro ao processar o código da cidade: {str(e)}")
     
 
@@ -111,9 +117,11 @@ def filterIbgeCodeInResponse(dict: dict, key: str) -> str:
     """
     try:
         if key in dict: return dict[key]            
+        logger.info("A chave 'ibge' não foi encontrada no dicionário.")
         raise KeyError("A chave 'ibge' não foi encontrada no dicionário.")
     
     except Exception as e:
+        logger.info(f"Erro ao filtrar a ibge: {e}")
         raise Exception(f"Erro ao filtrar a ibge: {e}")
     
 
@@ -133,16 +141,18 @@ def requestGetToIbge(code: str) -> dict:
         response = requests.get(f'https://servicodados.ibge.gov.br/api/v1/pesquisas/indicadores/28122/resultados/0%7C{code}')
         
         if response.status_code != 200:
+            logger.info(f"Erro ao fazer a requisição à API do IBGE: {e}")
             raise ValueError(f"Erro ao fazer a requisição à API do IBGE: {e}")
         
         return response.json()
     except requests.exceptions.RequestException as e:
+        logger.info(f"Erro ao fazer a requisição: {e}")
         raise Exception(f"Erro ao fazer a requisição: {e}")
-    
     except ValueError as e:
+        logger.info(f"Erro ao processar a resposta: {e}")
         raise ValueError(f"Erro ao processar a resposta: {e}")
-    
     except Exception as e:
+        logger.info(f"Erro inesperado: {e}")
         raise Exception(f"Erro inesperado: {e}")
 
 
@@ -162,6 +172,7 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
     """
     try:
         if not responseJson:
+            logger.info("O JSON de resposta está vazio.")
             raise ValueError("O JSON de resposta está vazio.")
 
         localidades = []
@@ -188,10 +199,13 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
 
         return dataFrame
     except KeyError as e:
+        logger.info(f"Erro: Chave ausente no JSON - {str(e)}")
         raise KeyError(f"Erro: Chave ausente no JSON - {str(e)}")
     except TypeError as e:
+        logger.info(f"Erro: Falha ao converter valores para inteiros - {str(e)}")
         raise TypeError(f"Erro: Falha ao converter valores para inteiros - {str(e)}")
     except Exception as e:
+        logger.info(f"Erro inesperado ao processar o JSON: {str(e)}")
         raise Exception(f"Erro inesperado ao processar o JSON: {str(e)}")
     
 
@@ -212,6 +226,7 @@ def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
 
         # Verifica se há dados para a cidade
         if df_cidade.empty:
+            logger.info(f"Nenhum dado encontrado para {cityName}.")
             raise ValueError(f"Nenhum dado encontrado para {cityName}.")
 
         # Cria o gráfico
@@ -242,10 +257,13 @@ def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
 
         return fig
     except ValueError as e:
+        logger.info(f"Erro: {str(e)}")
         raise ValueError(f"Erro: {str(e)}")
     except KeyError as e:
+        logger.info(f"Erro: Chave ausente no DataFrame - {str(e)}")
         raise KeyError(f"Erro: Chave ausente no DataFrame - {str(e)}")
     except Exception as e:
+        logger.info(f"Erro inesperado ao plotar o gráfico: {str(e)}")
         raise Exception(f"Erro inesperado ao plotar o gráfico: {str(e)}")
     
 
