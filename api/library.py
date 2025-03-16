@@ -9,7 +9,7 @@ if not os.path.exists('logs'):
 
 logging.basicConfig(
     filename='logs/app.log',
-    level=logging.DEBUG,
+    level=logging.ERROR,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
@@ -246,7 +246,7 @@ def plotGraph(df: pd.DataFrame, codeIbge: str, cityName: str):
 
         # Define os rótulos do eixo x para mostrar todos os anos
         ax.set_xticks(df_cidade['Ano'])
-        ax.tick_params(axis='x', rotation=45)  # Rotaciona os rótulos para melhor legibilidade
+        ax.tick_params(axis='x', rotation=45)
 
         # Adiciona legendas e grid
         ax.legend(fontsize=12)

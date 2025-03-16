@@ -17,7 +17,7 @@ if not os.path.exists('logs'):
 
 logging.basicConfig(
     filename='logs/app.log',
-    level=logging.DEBUG,
+    level=logging.ERROR,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
