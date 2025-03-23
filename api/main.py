@@ -2,7 +2,7 @@ import streamlit as st
 import logging
 import os
 from library import (
-    inputCep,
+    checkCep,
     requestGetToViaCep,
     filterIbgeCodeInResponse,
     requestGetToIbge,
@@ -17,11 +17,10 @@ if not os.path.exists('logs'):
 
 logging.basicConfig(
     filename='logs/app.log',
-    level=logging.ERROR,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
-
 logger = logging.getLogger(__name__)
 
 def main():
@@ -34,12 +33,14 @@ def main():
         com base no código do IBGE obtido a partir de um CEP da localidade.
     """)
 
-    cep = st.text_input("Digite o CEP:", placeholder="Ex: 99999-999")
+    cepInput = st.text_input("Digite o CEP:", placeholder="Digite o CEP no Formato Padrão 99999-999 ou Numérico 99999999")
+    cep = checkCep(cepInput) if cepInput else None
 
     if st.button("Buscar Dados"):
+
         if not cep:
             st.error("Por favor, insira um CEP válido.")
-            logger.warning("CEP não foi inserido.")
+            logger.warning("O CEP inserido não é válido.")
         else:
             try:
                 logger.info(f"Iniciando busca para o CEP: {cep}")

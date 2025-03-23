@@ -3,43 +3,46 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import logging
+import re
 
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
 logging.basicConfig(
     filename='logs/app.log',
-    level=logging.ERROR,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
-
 logger = logging.getLogger(__name__)
 
-
-def inputCep() -> str:
+def checkCep(cep: str = None) -> str | None:
     """
-    O método solicita ao usuário que insira um CEP e verifica se o valor inserido
-    é uma string de no máximo 8 dígitos e contém apenas números, caso o CEP seja
-    inválido uma exception é levantada.
+    Valida um CEP fornecido como argumento. Aceita apenas valores numéricos de 8 dígitos ou
+    no formato '99999-999'. Retorna sempre o CEP apenas com números.
+    
+    @param cep: O CEP fornecido pelo usuário.
+    @type cep: str
+    
+    @return: O CEP válido com apenas números ou None se for inválido.
+    @rtype: str | None
 
-    @return: Retorna o CEP válido inserido pelo usuário.
-    @rtype: str
-
-    @raises ValueError: Se o CEP inserido não for uma string de 8 dígitos numéricos.
     @raises Exception: Se ocorrer um erro inesperado durante a execução do método.
     """
     try:
-        cep = input("Insira o número do CEP para consulta: ")
+        if not cep:
+            return None
+
+        cep_match = re.fullmatch(r"(\d{5})-?(\d{3})", cep)
         
-        if len(cep) != 8 or not cep.isdigit():
-            logger.info("CEP inválido. O CEP deve conter exatamente 8 dígitos numéricos.")
-            raise ValueError("CEP inválido. O CEP deve conter exatamente 8 dígitos numéricos.")
-        
-        return cep
+        if cep_match:
+            return f"{cep_match.group(1)}{cep_match.group(2)}"
+
+        logger.info("CEP inválido. Deve conter 8 dígitos numéricos ou estar no formato 99999-999.")
+        return None
     except Exception as e:
-        logger.info(f"Erro ao fazer a requisição: {e}")
-        raise Exception(f"Erro ao fazer a requisição: {e}")
+        logger.error(f"Erro ao processar o CEP: {str(e)}")
+        raise Exception(f"Erro ao processar o CEP: {str(e)}")
 
 
 def requestGetToViaCep(cep: str) -> dict:
@@ -66,14 +69,14 @@ def requestGetToViaCep(cep: str) -> dict:
         
         return response.json()
     except requests.exceptions.RequestException as e:
-        logger.info(f"Erro ao fazer a requisição: {e}")
-        raise Exception(f"Erro ao fazer a requisição: {e}")
+        logger.info(f"Erro ao fazer a requisição: {str(e)}")
+        raise Exception(f"Erro ao fazer a requisição: {str(e)}")
     except ValueError as e:
-        logger.info(f"Erro ao processar a resposta: {e}")
-        raise ValueError(f"Erro ao processar a resposta: {e}")
+        logger.info(f"Erro ao processar a resposta: {str(e)}")
+        raise ValueError(f"Erro ao processar a resposta: {str(e)}")
     except Exception as e:
-        logger.info(f"Erro inesperado: {e}")
-        raise Exception(f"Erro inesperado: {e}")
+        logger.info(f"Erro inesperado: {str(e)}")
+        raise Exception(f"Erro inesperado: {str(e)}")
     
 
 def setString(cityCode: str) -> str:
@@ -91,8 +94,8 @@ def setString(cityCode: str) -> str:
     """
     try:
         if not cityCode:
-            logger.info(f"O código não foi enviado: {e}")
-            raise ValueError(f"O código não foi enviado: {e}")
+            logger.info(f"O código não foi enviado: {str(e)}")
+            raise ValueError(f"O código não foi enviado: {str(e)}")
         
         return cityCode[:-1]
     except Exception as e:
@@ -116,13 +119,14 @@ def filterIbgeCodeInResponse(dict: dict, key: str) -> str:
     @raises Exception: Se ocorrer um erro inesperado durante a execução do método.
     """
     try:
-        if key in dict: return dict[key]            
-        logger.info("A chave 'ibge' não foi encontrada no dicionário.")
-        raise KeyError("A chave 'ibge' não foi encontrada no dicionário.")
+        if key in dict: return dict[key]
+                    
+        logger.info("A chave 'ibge' não foi encontrada na response.")
+        raise KeyError("A chave 'ibge' não foi encontrada na response.")
     
     except Exception as e:
-        logger.info(f"Erro ao filtrar a ibge: {e}")
-        raise Exception(f"Erro ao filtrar a ibge: {e}")
+        logger.info(f"O CEP Não existe: {str(e)}")
+        raise Exception(f"O CEP Não existe: {str(e)}")
     
 
 def requestGetToIbge(code: str) -> dict:
@@ -141,19 +145,19 @@ def requestGetToIbge(code: str) -> dict:
         response = requests.get(f'https://servicodados.ibge.gov.br/api/v1/pesquisas/indicadores/28122/resultados/0%7C{code}')
         
         if response.status_code != 200:
-            logger.info(f"Erro ao fazer a requisição à API do IBGE: {e}")
-            raise ValueError(f"Erro ao fazer a requisição à API do IBGE: {e}")
+            logger.info(f"Erro ao fazer a requisição à API do IBGE: {str(e)}")
+            raise ValueError(f"Erro ao fazer a requisição à API do IBGE: {str(e)}")
         
         return response.json()
     except requests.exceptions.RequestException as e:
-        logger.info(f"Erro ao fazer a requisição: {e}")
-        raise Exception(f"Erro ao fazer a requisição: {e}")
+        logger.info(f"Erro ao fazer a requisição: {str(e)}")
+        raise Exception(f"Erro ao fazer a requisição: {str(e)}")
     except ValueError as e:
-        logger.info(f"Erro ao processar a resposta: {e}")
-        raise ValueError(f"Erro ao processar a resposta: {e}")
+        logger.info(f"Erro ao processar a resposta: {str(e)}")
+        raise ValueError(f"Erro ao processar a resposta: {str(e)}")
     except Exception as e:
-        logger.info(f"Erro inesperado: {e}")
-        raise Exception(f"Erro inesperado: {e}")
+        logger.info(f"Erro inesperado: {str(e)}")
+        raise Exception(f"Erro inesperado: {str(e)}")
 
 
 def prepareDataFrame(responseJson: list) -> pd.DataFrame:
@@ -184,8 +188,8 @@ def prepareDataFrame(responseJson: list) -> pd.DataFrame:
 
             if localidade == '0':
                 continue
-            res_data = entry['res']
 
+            res_data = entry['res']
             for ano, valor in res_data.items():
                 localidades.append(localidade)
                 anos.append(int(ano))
