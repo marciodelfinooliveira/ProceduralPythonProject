@@ -79,3 +79,9 @@ São Paulo - 04962-30
 Exemplos de Saida
 
 ![1742053265883](image/README/1742053265883.png)
+
+
+### Paralelamente é criado na pasta 'data' uma cópia em .xlsx do dataframe usado para extração de dados.
+
+
+![1748820368737](image/README/1748820368737.png)

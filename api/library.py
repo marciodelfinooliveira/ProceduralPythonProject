@@ -5,9 +5,11 @@ import os
 import logging
 import re
 
+# Cria diretório de logs, caso não já exista
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
+# Chamada da instância da lib referente aos logs.
 logging.basicConfig(
     filename='logs/app.log',
     level=logging.INFO,
@@ -18,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 def checkCep(cep: str = None) -> str | None:
     """
-    Valida um CEP fornecido como argumento. Aceita apenas valores numéricos de 8 dígitos ou
-    no formato '99999-999'. Retorna sempre o CEP apenas com números.
+    Valida um CEP fornecido como argumento. Aceita apenas valores numéricos de 8 dígitos 
+    como '99999999' ou no formato '99999-999'. Retorna sempre o CEP apenas com números.
     
     @param cep: O CEP fornecido pelo usuário.
     @type cep: str

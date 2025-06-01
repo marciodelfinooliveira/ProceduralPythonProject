@@ -1,6 +1,7 @@
 import streamlit as st
 import logging
 import os
+import sys
 from library import (
     checkCep,
     requestGetToViaCep,
@@ -12,9 +13,11 @@ from library import (
     saveIbgeResponse
 )
 
+# Cria diretório de logs, caso não já exista
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
+# Chamada da instância da lib referente aos logs.
 logging.basicConfig(
     filename='logs/app.log',
     level=logging.INFO,
@@ -29,8 +32,8 @@ def main():
     """
     st.title("Análise de Frota de Veículos por Cidade")
     st.markdown("""
-        Esta aplicação permite visualizar o crescimento da frota de veículos em uma cidade específica, 
-        com base no código do IBGE obtido a partir de um CEP da localidade.
+        Esta aplicação permite visualizar o crescimento da frota de veículos de uma cidade específica, 
+        com base no código IBGE obtido a partir de um CEP da localidade.
     """)
 
     cepInput = st.text_input("Digite o CEP:", placeholder="Digite o CEP no Formato Padrão 99999-999 ou Numérico 99999999")
@@ -74,5 +77,9 @@ def main():
             except Exception as e:
                 st.error(f"Erro inesperado ao executar o sistema: {str(e)}")
                 logger.error(f"Erro inesperado: {str(e)}")
-        
-main() if (__name__ == "__main__") else exit
+
+# Chamada da função 'main' via condição ternária, 
+# garantindo a execução apenas quando (__name__ == "__main__") 
+# ou seja, este script deve ser chamado diretamente, de outra forma
+# será ignorado.
+main() if (__name__ == "__main__") else sys.exit()

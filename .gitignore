@@ -1,10 +1,14 @@
+# IGNORAR VENV
 /venv/
 
+# IGNORAR CACHE DO SISTEMA
 api/__pycache__/
 
+# IGNORAR TABELAS GERADAS
 /data/*
 !/data/
 
+# IGNORA LOGS INTERNOS
 /logs/*
 !/logs/
 
