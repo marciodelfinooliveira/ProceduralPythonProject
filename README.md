@@ -50,7 +50,7 @@ python -m venv venv # Para sistemas Windows
 ```bash
 source venv/bin/activate  # Para sistemas UNIX
 
-venv/Scripts/activate # Para sistemas Windows
+venv\Scripts\activate # Para sistemas Windows
 ```
 
 ### Instale as bibliotecas necessárias
@@ -62,7 +62,9 @@ pip install -r requirements.txt
 ### Execute o sistema via Streamlit
 
 ```bash
-streamlit run ./api/main.py
+streamlit run ./api/main.py # Para sistemas UNIX
+
+streamlit run .\api\main.py # Para sistemas Windows
 ```
 
 ### Programa em Execução - Porta padrão (http://localhost:8501/)

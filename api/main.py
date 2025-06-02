@@ -41,7 +41,7 @@ def main():
 
     if st.button("Buscar Dados"):
 
-        if not cep:
+        if cep == None:
             st.error("Por favor, insira um CEP válido.")
             logger.warning("O CEP inserido não é válido.")
         else:
