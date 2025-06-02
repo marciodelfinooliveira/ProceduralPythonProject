@@ -41,12 +41,16 @@ cd ProceduralPythonProject/
 
 ```bash
 python3 -m venv venv  # Para sistemas UNIX
+
+python -m venv venv # Para sistemas Windows
 ```
 
 ### Ative a Virtual Environment
 
 ```bash
 source venv/bin/activate  # Para sistemas UNIX
+
+venv/Scripts/activate # Para sistemas Windows
 ```
 
 ### Instale as bibliotecas necessárias
@@ -80,8 +84,6 @@ Exemplos de Saida
 
 ![1742053265883](image/README/1742053265883.png)
 
-
 ### Paralelamente é criado na pasta 'data' uma cópia em .xlsx do dataframe usado para extração de dados.
-
 
 ![1748820368737](image/README/1748820368737.png)
